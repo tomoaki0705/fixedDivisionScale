@@ -1,7 +1,10 @@
 from cmath import log
 from pptx.enum.shapes import MSO_CONNECTOR
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.enum.dml import MSO_FILL_TYPE
+from pptx.dml.color import RGBColor
 from pptx import Presentation
-from pptx.util import Cm
+from pptx.util import Cm, Pt
 import math
 
 prs = Presentation('A4_template.pptx')
@@ -20,6 +23,9 @@ def drawLog10Line(begin,inclusiveEnd,slide,y,height=1,left=1,right=26,indexScale
         # print(f"scaledIndex:{scaledIndex}")
         position=scale*(math.log10(scaledIndex/(begin*indexScale)))+left
         # print(f"position:{position}")
+        textBox = slide.shapes.add_textbox(Cm(position-0.5), Cm(y-2), Cm(1), Cm(1))    #Text Box Shapeオブジェクトの追加
+        paragraph0 = textBox.text_frame
+        paragraph0.text = str(scaledIndex)
         slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.5), Cm(position), Cm(y+0.5))
 
 def drawLogLine(begin,end,ticNumber,base,slide,y,height=1,left=1,right=26,indexScale=1):
