@@ -22,30 +22,37 @@ def drawLog10Line(begin,inclusiveEnd,slide,y,height=1,left=1,right=26,indexScale
         scaledIndex = i * indexScale
         # print(f"scaledIndex:{scaledIndex}")
         position=scale*(math.log10(scaledIndex/(begin*indexScale)))+left
+        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.5), Cm(position), Cm(y+0.5))
         # print(f"position:{position}")
-        textBox = slide.shapes.add_textbox(Cm(position-0.5), Cm(y-2), Cm(1), Cm(1))    #Text Box Shapeオブジェクトの追加
+        textBox = slide.shapes.add_textbox(Cm(position-0.5), Cm(y-2), Cm(1), Cm(1))
         paragraph0 = textBox.text_frame
         paragraph0.text = str(scaledIndex)
-        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.5), Cm(position), Cm(y+0.5))
 
 def drawLogLine(begin,end,ticNumber,base,slide,y,height=1,left=1,right=26,indexScale=1):
     horizontalLength=right-left
-    scale=horizontalLength/(math.log(end)/math.log(base))
+    scale=horizontalLength/(math.log(end/begin)/math.log(base))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
-    print (f"bgein:{begin}")
-    print (f"end  :{end}")
+    # print (f"bgein:{begin}")
+    # print (f"end  :{end}")
     leftLog = math.log(begin)/math.log(base)
+    # print(f"leftLog    :{leftLog}")
     for i in range(0,ticNumber):
         scaledIndex = i * indexScale + begin
-        print(f"scaledIndex:{scaledIndex}")
-        position=scale*(math.log(scaledIndex)/math.log(base))-leftLog+left
-        print(f"position:{position}")
+        position=scale*((math.log(scaledIndex)/math.log(base))-leftLog)+left
+        # print(f"scaledIndex:{scaledIndex}")
+        # print(f"position   :{position}")
         slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.5), Cm(position), Cm(y+0.5))
+        textBox = slide.shapes.add_textbox(Cm(position-0.5), Cm(y-2), Cm(1), Cm(1))
+        paragraph0 = textBox.text_frame
+        paragraph0.text = str(scaledIndex)
 
 # line1=slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, 1, Cm(2), Cm(1), Cm(2))
 # line1=slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(1), Cm(1), Cm(3), Cm(3))
 
 drawLog10Line(1,10,slide,3)
-drawLogLine(1,2,11,2,slide,5,indexScale=0.1)
+drawLogLine(1,2,11,2,slide,6,indexScale=0.1)
+drawLogLine(16,160,19,2,slide,9,indexScale=8)
+drawLogLine(160,1600,10,2,slide,12,indexScale=160)
+# drawLogLine(160,1600,46,2,slide,12,indexScale=32)
 
 prs.save('test.pptx')
