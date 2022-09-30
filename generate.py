@@ -23,9 +23,19 @@ slide = prs.slides.add_slide(title_slide_layout)
 # title.text = "Hello, World!"
 # subtitle.text = "python-pptx was here!"
 
+def computeScale(left, right,scaleOnLine):
+    lengthInCentimeter = right - left
+    return lengthInCentimeter / scaleOnLine
+
+def drawTicker(begin,inclusiveEnd,scaleGap,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,tickerHeight=tickerLengthLevel0):
+    tickerIndex = begin
+    scale = computeScale(left,right,math.log10(inclusiveEnd))
+    while(tickerIndex <= inclusiveEnd):
+        position = scale*(math.log10(tickerIndex/begin))+left
+        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-tickerHeight), Cm(position), Cm(y+tickerHeight))
+
 def drawLog10Line(begin,inclusiveEnd,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
-    horizontalLength=right-left
-    scale=horizontalLength/(math.log10(inclusiveEnd))
+    scale = computeScale(left, right, math.log10(inclusiveEnd))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
     for i in range(begin,inclusiveEnd+1):
         scaledIndex = i * indexScale
@@ -51,8 +61,7 @@ def patch_connector():
 patch_connector()
 
 def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
-    horizontalLength=right-left
-    scale=horizontalLength/(math.log10(inclusiveEnd))
+    scale = computeScale(left, right, math.log10(inclusiveEnd))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
     for i in range(begin,inclusiveEnd+1):
         scaledIndex = i * indexScale
@@ -76,8 +85,7 @@ def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=1,left=defaultLeftPosi
             slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
 
 def drawLog2Line(begin,end,ticNumber,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
-    horizontalLength=right-left
-    scale=horizontalLength/(math.log2(end/begin))
+    scale = computeScale(left, right, math.log2(end/begin))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
     # print (f"bgein:{begin}")
     # print (f"end  :{end}")
