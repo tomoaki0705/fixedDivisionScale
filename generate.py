@@ -10,6 +10,9 @@ from pptx import Presentation
 from pptx.util import Cm, Pt
 import math
 
+defaultLeftPosition = 1
+defaultRightPosition = 26
+
 prs = Presentation('A4_template.pptx')
 title_slide_layout = prs.slide_layouts[6]
 slide = prs.slides.add_slide(title_slide_layout)
@@ -17,7 +20,7 @@ slide = prs.slides.add_slide(title_slide_layout)
 # title.text = "Hello, World!"
 # subtitle.text = "python-pptx was here!"
 
-def drawLog10Line(begin,inclusiveEnd,slide,y,height=1,left=1,right=26,indexScale=1):
+def drawLog10Line(begin,inclusiveEnd,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
     horizontalLength=right-left
     scale=horizontalLength/(math.log10(inclusiveEnd))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
@@ -44,7 +47,7 @@ def patch_connector():
     Connector.get_or_add_ln = get_or_add_ln
 patch_connector()
 
-def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=1,left=1,right=26,indexScale=1):
+def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
     horizontalLength=right-left
     scale=horizontalLength/(math.log10(inclusiveEnd))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
@@ -69,7 +72,7 @@ def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=1,left=1,right=26,inde
             position=right - scale*(math.log10(fineTics/(begin*indexScale)))
             slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
 
-def drawLog2Line(begin,end,ticNumber,slide,y,height=1,left=1,right=26,indexScale=1):
+def drawLog2Line(begin,end,ticNumber,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
     horizontalLength=right-left
     scale=horizontalLength/(math.log2(end/begin))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
@@ -124,8 +127,8 @@ slide2 = prs.slides.add_slide(title_slide_layout)
 
 offset = verticalOffset
 drawLog10LineInvert(1,10,slide2,offset)
-divScale=(26-1)
-divLeft=26-(divScale * math.log10(8))
+divScale=(defaultRightPosition-defaultLeftPosition)
+divLeft=defaultRightPosition-(divScale * math.log10(8))
 offset += verticalOffset
 drawLog2Line(2,16,15,slide2,offset,indexScale=1,left=divLeft)
 drawLog2Line(1.6,2,1,slide2,offset,indexScale=0.1,right=divLeft)
@@ -133,7 +136,7 @@ offset += verticalOffset
 drawLog2Line(4,32,28,slide2,offset,indexScale=1,left=divLeft)
 drawLog2Line(3.2,4,1,slide2,offset,indexScale=0.1,right=divLeft)
 offset += verticalOffset
-divLeft=26-(divScale * math.log10(64/7))
+divLeft=defaultRightPosition-(divScale * math.log10(64/7))
 drawLog2Line(7,64,58,slide2,offset,indexScale=1,left=divLeft)
 drawLog2Line(6.4,7,1,slide2,offset,indexScale=0.1,right=divLeft)
 
