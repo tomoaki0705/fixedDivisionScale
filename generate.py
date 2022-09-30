@@ -2,8 +2,10 @@ from cmath import log
 from pptx.enum.shapes import MSO_CONNECTOR
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.dml import MSO_FILL_TYPE
-from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN
+from pptx.dml.color import RGBColor
+from pptx.dml.line import LineFormat
+from pptx.shapes.connector import Connector
 from pptx import Presentation
 from pptx.util import Cm, Pt
 import math
@@ -33,6 +35,38 @@ def drawLog10Line(begin,inclusiveEnd,slide,y,height=1,left=1,right=26,indexScale
         for j in range(0,10):
             fineTics = scaledIndex + 0.1 * j
             position=scale*(math.log10(fineTics/(begin*indexScale)))+left
+            slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
+
+
+def patch_connector():
+    def get_or_add_ln(self):
+        return self._element.spPr.get_or_add_ln()
+    Connector.get_or_add_ln = get_or_add_ln
+patch_connector()
+
+def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=1,left=1,right=26,indexScale=1):
+    horizontalLength=right-left
+    scale=horizontalLength/(math.log10(inclusiveEnd))
+    slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
+    for i in range(begin,inclusiveEnd+1):
+        scaledIndex = i * indexScale
+        # print(f"scaledIndex:{scaledIndex}")
+        position=right - scale*(math.log10(scaledIndex/(begin*indexScale)))
+        line = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.5), Cm(position), Cm(y+0.5))
+        # line.ln = line.get_or_add_ln
+        # lineFormat = LineFormat(line)
+        # lineFormat.fill.fore_color.rgb = RGBColor(255, 0, 0)
+        # line.color.rgb = RGBColor(255, 0, 0)
+        # print(f"position:{position}")
+        textBox = slide.shapes.add_textbox(Cm(position-0.5), Cm(y-2), Cm(1), Cm(1))
+        paragraph0 = textBox.text_frame
+        paragraph0.text = str(scaledIndex)
+        # paragraph0.font.color.rgb = RGBColor(255,0,0)
+    for i in range(begin,inclusiveEnd):
+        scaledIndex = i * indexScale
+        for j in range(0,10):
+            fineTics = scaledIndex + 0.1 * j
+            position=right - scale*(math.log10(fineTics/(begin*indexScale)))
             slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
 
 def drawLogLine(begin,end,ticNumber,base,slide,y,height=1,left=1,right=26,indexScale=1):
@@ -85,5 +119,10 @@ offset += verticalOffset
 drawLogLine(128,1280,19,2,slide,offset,indexScale=64)
 offset += verticalOffset
 
+title_slide_layout = prs.slide_layouts[6]
+slide2 = prs.slides.add_slide(title_slide_layout)
+
+offset = verticalOffset
+drawLog10LineInvert(1,10,slide2,offset)
 
 prs.save('test.pptx')
