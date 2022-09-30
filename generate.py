@@ -69,17 +69,17 @@ def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=1,left=1,right=26,inde
             position=right - scale*(math.log10(fineTics/(begin*indexScale)))
             slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
 
-def drawLogLine(begin,end,ticNumber,base,slide,y,height=1,left=1,right=26,indexScale=1):
+def drawLog2Line(begin,end,ticNumber,slide,y,height=1,left=1,right=26,indexScale=1):
     horizontalLength=right-left
-    scale=horizontalLength/(math.log(end/begin)/math.log(base))
+    scale=horizontalLength/(math.log2(end/begin))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
     # print (f"bgein:{begin}")
     # print (f"end  :{end}")
-    leftLog = math.log(begin)/math.log(base)
+    leftLog = math.log2(begin)
     # print(f"leftLog    :{leftLog}")
     for i in range(0,ticNumber):
         scaledIndex = i * indexScale + begin
-        position=scale*((math.log(scaledIndex)/math.log(base))-leftLog)+left
+        position=scale*((math.log2(scaledIndex))-leftLog)+left
         # print(f"scaledIndex:{scaledIndex}")
         # print(f"position   :{position}")
         slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.5), Cm(position), Cm(y+0.5))
@@ -93,7 +93,7 @@ def drawLogLine(begin,end,ticNumber,base,slide,y,height=1,left=1,right=26,indexS
         scaledIndex = i * indexScale + begin
         for j in range(1,8):
             fineTics = (scaledIndex + (j * begin/16)) * 1.0
-            position=scale*(math.log(fineTics)/math.log(base)-leftLog)+left
+            position=scale*(math.log2(fineTics)-leftLog)+left
             # print(f"{fineTics},{position}")
             slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
 
@@ -106,17 +106,17 @@ drawLog10Line(1,10,slide,offset)
 offset += verticalOffset
 # drawLogLine(1,2,11,2,slide,offset,indexScale=0.1)
 # offset += verticalOffset
-drawLogLine(16,160,19,2,slide,offset,indexScale=8)
+drawLog2Line(16,160,19,slide,offset,indexScale=8)
 offset += verticalOffset
-drawLogLine(160,1600,19,2,slide,offset,indexScale=80)
+drawLog2Line(160,1600,19,slide,offset,indexScale=80)
 offset += verticalOffset
 # drawLogLine(160,1600,46,2,slide,offset,indexScale=32)
 # offset += verticalOffset
-drawLogLine(32,320,19,2,slide,offset,indexScale=16)
+drawLog2Line(32,320,19,slide,offset,indexScale=16)
 offset += verticalOffset
-drawLogLine(64,640,19,2,slide,offset,indexScale=32)
+drawLog2Line(64,640,19,slide,offset,indexScale=32)
 offset += verticalOffset
-drawLogLine(128,1280,19,2,slide,offset,indexScale=64)
+drawLog2Line(128,1280,19,slide,offset,indexScale=64)
 offset += verticalOffset
 
 title_slide_layout = prs.slide_layouts[6]
@@ -124,5 +124,18 @@ slide2 = prs.slides.add_slide(title_slide_layout)
 
 offset = verticalOffset
 drawLog10LineInvert(1,10,slide2,offset)
+divScale=(26-1)
+divLeft=26-(divScale * math.log10(8))
+offset += verticalOffset
+drawLog2Line(2,16,15,slide2,offset,indexScale=1,left=divLeft)
+drawLog2Line(1.6,2,1,slide2,offset,indexScale=0.1,right=divLeft)
+offset += verticalOffset
+drawLog2Line(4,32,28,slide2,offset,indexScale=1,left=divLeft)
+drawLog2Line(3.2,4,1,slide2,offset,indexScale=0.1,right=divLeft)
+offset += verticalOffset
+divLeft=26-(divScale * math.log10(64/7))
+drawLog2Line(7,64,58,slide2,offset,indexScale=1,left=divLeft)
+drawLog2Line(6.4,7,1,slide2,offset,indexScale=0.1,right=divLeft)
+
 
 prs.save('test.pptx')
