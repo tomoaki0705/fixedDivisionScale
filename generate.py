@@ -12,6 +12,9 @@ import math
 
 defaultLeftPosition = 1
 defaultRightPosition = 26
+tickerLengthLevel0 = 1.0/2
+tickerLengthLevel1 = 0.5/2
+tickerLengthLevel2 = 0.2/2
 
 prs = Presentation('A4_template.pptx')
 title_slide_layout = prs.slide_layouts[6]
@@ -28,7 +31,7 @@ def drawLog10Line(begin,inclusiveEnd,slide,y,height=1,left=defaultLeftPosition,r
         scaledIndex = i * indexScale
         # print(f"scaledIndex:{scaledIndex}")
         position=scale*(math.log10(scaledIndex/(begin*indexScale)))+left
-        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.5), Cm(position), Cm(y+0.5))
+        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-tickerLengthLevel0), Cm(position), Cm(y+tickerLengthLevel0))
         # print(f"position:{position}")
         textBox = slide.shapes.add_textbox(Cm(position-0.5), Cm(y-2), Cm(1), Cm(1))
         paragraph0 = textBox.text_frame
@@ -55,7 +58,7 @@ def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=1,left=defaultLeftPosi
         scaledIndex = i * indexScale
         # print(f"scaledIndex:{scaledIndex}")
         position=right - scale*(math.log10(scaledIndex/(begin*indexScale)))
-        line = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.5), Cm(position), Cm(y+0.5))
+        line = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-tickerLengthLevel0), Cm(position), Cm(y+tickerLengthLevel0))
         # line.ln = line.get_or_add_ln
         # lineFormat = LineFormat(line)
         # lineFormat.fill.fore_color.rgb = RGBColor(255, 0, 0)
@@ -85,7 +88,7 @@ def drawLog2Line(begin,end,ticNumber,slide,y,height=1,left=defaultLeftPosition,r
         position=scale*((math.log2(scaledIndex))-leftLog)+left
         # print(f"scaledIndex:{scaledIndex}")
         # print(f"position   :{position}")
-        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.5), Cm(position), Cm(y+0.5))
+        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-tickerLengthLevel0), Cm(position), Cm(y+tickerLengthLevel0))
         textBox = slide.shapes.add_textbox(Cm(position-0.5), Cm(y-1), Cm(1), Cm(1))
         textFrame0 = textBox.text_frame
         paragraph0 = textFrame0.paragraphs[0]
