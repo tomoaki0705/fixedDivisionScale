@@ -143,6 +143,9 @@ offset += verticalOffset
 # drawLogLine(160,1600,46,2,slide,offset,indexScale=32)
 # offset += verticalOffset
 drawLog2Line(32,320,19,slide,offset,indexScale=16)
+drawTicker(32,160,8,slide,offset,height=tickerLengthLevel0,right=positionOfFive)
+drawTicker(32,160,4,slide,offset,height=tickerLengthLevel1,right=positionOfFive)
+drawTicker(32,160,1,slide,offset,height=tickerLengthLevel2,right=positionOfFive)
 offset += verticalOffset
 drawLog2Line(64,640,19,slide,offset,indexScale=32)
 offset += verticalOffset
