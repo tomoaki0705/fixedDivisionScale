@@ -35,6 +35,14 @@ def drawTicker(begin,inclusiveEnd,scaleGap,slide,y,height=tickerLengthLevel0,lef
         slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y - height), Cm(position), Cm(y + height))
         tickerIndex += scaleGap
 
+def drawTickerInvert(begin,inclusiveEnd,scaleGap,slide,y,height=tickerLengthLevel0,left=defaultLeftPosition,right=defaultRightPosition):
+    tickerIndex = begin
+    scale = computeScale(left,right,math.log10(inclusiveEnd/begin))
+    while(tickerIndex <= inclusiveEnd):
+        position = right-scale*(math.log10(tickerIndex/begin))
+        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y - height), Cm(position), Cm(y + height))
+        tickerIndex += scaleGap
+
 def drawLog10Line(begin,inclusiveEnd,slide,y,height=tickerLengthLevel0,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
     scale = computeScale(left, right, math.log10(inclusiveEnd))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
@@ -62,7 +70,7 @@ def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=tickerLengthLevel0,lef
         scaledIndex = i * indexScale
         # print(f"scaledIndex:{scaledIndex}")
         position=right - scale*(math.log10(scaledIndex/(begin*indexScale)))
-        line = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-height), Cm(position), Cm(y+height))
+        # line = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-height), Cm(position), Cm(y+height))
         # line.ln = line.get_or_add_ln
         # lineFormat = LineFormat(line)
         # lineFormat.fill.fore_color.rgb = RGBColor(255, 0, 0)
@@ -72,12 +80,12 @@ def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=tickerLengthLevel0,lef
         paragraph0 = textBox.text_frame
         paragraph0.text = str(scaledIndex)
         # paragraph0.font.color.rgb = RGBColor(255,0,0)
-    for i in range(begin,inclusiveEnd):
-        scaledIndex = i * indexScale
-        for j in range(0,10):
-            fineTics = scaledIndex + 0.1 * j
-            position=right - scale*(math.log10(fineTics/(begin*indexScale)))
-            slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
+    # for i in range(begin,inclusiveEnd):
+    #     scaledIndex = i * indexScale
+    #     for j in range(0,10):
+    #         fineTics = scaledIndex + 0.1 * j
+    #         position=right - scale*(math.log10(fineTics/(begin*indexScale)))
+    #         slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
 
 def drawLog2Line(begin,end,ticNumber,slide,y,height=tickerLengthLevel0,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
     scale = computeScale(left, right, math.log2(end/begin))
@@ -157,18 +165,41 @@ slide2 = prs.slides.add_slide(title_slide_layout)
 
 offset = verticalOffset
 drawLog10LineInvert(1,10,slide2,offset)
-divScale=(defaultRightPosition-defaultLeftPosition)
-divLeft=defaultRightPosition-(divScale * math.log10(8))
-offset += verticalOffset
-drawLog2Line(2,16,15,slide2,offset,indexScale=1,left=divLeft)
-drawLog2Line(1.6,2,1,slide2,offset,indexScale=0.1,right=divLeft)
-offset += verticalOffset
-drawLog2Line(4,32,28,slide2,offset,indexScale=1,left=divLeft)
-drawLog2Line(3.2,4,1,slide2,offset,indexScale=0.1,right=divLeft)
-offset += verticalOffset
-divLeft=defaultRightPosition-(divScale * math.log10(64/7))
-drawLog2Line(7,64,58,slide2,offset,indexScale=1,left=divLeft)
-drawLog2Line(6.4,7,1,slide2,offset,indexScale=0.1,right=divLeft)
 
+positionOfTwo  = defaultRightPosition - topScale * math.log10(2)
+positionOfFive = defaultRightPosition - topScale * math.log10(5)
+drawLog10LineInvert(1,10,slide2,offset)
+drawTickerInvert(1,2 ,0.05,slide2,offset,height=tickerLengthLevel1,left=positionOfTwo)
+drawTickerInvert(1,2 ,0.01,slide2,offset,height=tickerLengthLevel2,left=positionOfTwo)
+drawTickerInvert(2,5 ,0.1 ,slide2,offset,height=tickerLengthLevel1,right=positionOfTwo,left=positionOfFive)
+drawTickerInvert(2,5 ,0.02,slide2,offset,height=tickerLengthLevel2,right=positionOfTwo,left=positionOfFive)
+drawTickerInvert(5,10,0.1 ,slide2,offset,height=tickerLengthLevel1,right=positionOfFive)
+drawTickerInvert(5,10,0.05,slide2,offset,height=tickerLengthLevel2,right=positionOfFive)
+
+divScale=(defaultRightPosition-defaultLeftPosition)
+positionOfEight=defaultRightPosition-(divScale * math.log10(8))
+offset += verticalOffset
+drawLog2Line(2,16,15,slide2,offset,indexScale=1,left=positionOfEight)
+drawTicker(2,16,1,slide2,offset,height=tickerLengthLevel0,left=positionOfEight)
+offset += verticalOffset
+positionOfThree=defaultRightPosition-(divScale * math.log10(32/3))
+drawLog2Line(3,32,30,slide2,offset,indexScale=1,left=positionOfThree)
+drawTicker(3,32,1,slide2,offset,height=tickerLengthLevel0,left=positionOfThree)
+offset += verticalOffset
+drawLog2Line(6 ,32,27,slide2,offset,indexScale=1,left=positionOfThree,right=positionOfTwo)
+drawLog2Line(32,64,17,slide2,offset,indexScale=2,left=positionOfTwo)
+drawTicker(6,32,1,slide2,offset,height=tickerLengthLevel0,left=positionOfThree,right=positionOfTwo)
+drawTicker(32,64,2,slide2,offset,height=tickerLengthLevel0,left=positionOfTwo)
+drawTicker(32,64,1,slide2,offset,height=tickerLengthLevel1,left=positionOfTwo)
+offset += verticalOffset
+positionOfFour=defaultRightPosition-(divScale * math.log10(4))
+drawLog2Line(12,32 ,21,slide2,offset,indexScale=1,left=positionOfThree,right=positionOfFour)
+drawLog2Line(32,64,17,slide2,offset,indexScale=2,left=positionOfFour,right=positionOfTwo)
+drawLog2Line(64,128,17,slide2,offset,indexScale=4,left=positionOfTwo)
+drawTicker(12,32 ,1,slide2,offset,height=tickerLengthLevel0,left=positionOfThree,right=positionOfFour)
+drawTicker(32,64 ,2,slide2,offset,height=tickerLengthLevel0,left=positionOfFour,right=positionOfTwo)
+drawTicker(32,64 ,1,slide2,offset,height=tickerLengthLevel1,left=positionOfFour,right=positionOfTwo)
+drawTicker(64,128,4,slide2,offset,height=tickerLengthLevel0,left=positionOfTwo)
+drawTicker(64,128,1,slide2,offset,height=tickerLengthLevel1,left=positionOfTwo)
 
 prs.save('test.pptx')
