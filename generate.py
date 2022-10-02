@@ -27,31 +27,26 @@ def computeScale(left, right,scaleOnLine):
     lengthInCentimeter = right - left
     return lengthInCentimeter / scaleOnLine
 
-def drawTicker(begin,inclusiveEnd,scaleGap,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,tickerHeight=tickerLengthLevel0):
+def drawTicker(begin,inclusiveEnd,scaleGap,slide,y,height=tickerLengthLevel0,left=defaultLeftPosition,right=defaultRightPosition):
     tickerIndex = begin
-    scale = computeScale(left,right,math.log10(inclusiveEnd))
+    scale = computeScale(left,right,math.log10(inclusiveEnd/begin))
     while(tickerIndex <= inclusiveEnd):
         position = scale*(math.log10(tickerIndex/begin))+left
-        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-tickerHeight), Cm(position), Cm(y+tickerHeight))
+        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y - height), Cm(position), Cm(y + height))
+        tickerIndex += scaleGap
 
-def drawLog10Line(begin,inclusiveEnd,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
+def drawLog10Line(begin,inclusiveEnd,slide,y,height=tickerLengthLevel0,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
     scale = computeScale(left, right, math.log10(inclusiveEnd))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
     for i in range(begin,inclusiveEnd+1):
         scaledIndex = i * indexScale
         # print(f"scaledIndex:{scaledIndex}")
         position=scale*(math.log10(scaledIndex/(begin*indexScale)))+left
-        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-tickerLengthLevel0), Cm(position), Cm(y+tickerLengthLevel0))
+        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-height), Cm(position), Cm(y+height))
         # print(f"position:{position}")
         textBox = slide.shapes.add_textbox(Cm(position-0.5), Cm(y-2), Cm(1), Cm(1))
         paragraph0 = textBox.text_frame
         paragraph0.text = str(scaledIndex)
-    for i in range(begin,inclusiveEnd):
-        scaledIndex = i * indexScale
-        for j in range(0,10):
-            fineTics = scaledIndex + 0.1 * j
-            position=scale*(math.log10(fineTics/(begin*indexScale)))+left
-            slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
 
 
 def patch_connector():
@@ -60,14 +55,14 @@ def patch_connector():
     Connector.get_or_add_ln = get_or_add_ln
 patch_connector()
 
-def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
+def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=tickerLengthLevel0,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
     scale = computeScale(left, right, math.log10(inclusiveEnd))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
     for i in range(begin,inclusiveEnd+1):
         scaledIndex = i * indexScale
         # print(f"scaledIndex:{scaledIndex}")
         position=right - scale*(math.log10(scaledIndex/(begin*indexScale)))
-        line = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-tickerLengthLevel0), Cm(position), Cm(y+tickerLengthLevel0))
+        line = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-height), Cm(position), Cm(y+height))
         # line.ln = line.get_or_add_ln
         # lineFormat = LineFormat(line)
         # lineFormat.fill.fore_color.rgb = RGBColor(255, 0, 0)
@@ -84,7 +79,7 @@ def drawLog10LineInvert(begin,inclusiveEnd,slide,y,height=1,left=defaultLeftPosi
             position=right - scale*(math.log10(fineTics/(begin*indexScale)))
             slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
 
-def drawLog2Line(begin,end,ticNumber,slide,y,height=1,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
+def drawLog2Line(begin,end,ticNumber,slide,y,height=tickerLengthLevel0,left=defaultLeftPosition,right=defaultRightPosition,indexScale=1):
     scale = computeScale(left, right, math.log2(end/begin))
     slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(left), Cm(y), Cm(right), Cm(y))
     # print (f"bgein:{begin}")
@@ -96,7 +91,7 @@ def drawLog2Line(begin,end,ticNumber,slide,y,height=1,left=defaultLeftPosition,r
         position=scale*((math.log2(scaledIndex))-leftLog)+left
         # print(f"scaledIndex:{scaledIndex}")
         # print(f"position   :{position}")
-        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-tickerLengthLevel0), Cm(position), Cm(y+tickerLengthLevel0))
+        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-height), Cm(position), Cm(y+height))
         textBox = slide.shapes.add_textbox(Cm(position-0.5), Cm(y-1), Cm(1), Cm(1))
         textFrame0 = textBox.text_frame
         paragraph0 = textFrame0.paragraphs[0]
@@ -116,7 +111,16 @@ def drawLog2Line(begin,end,ticNumber,slide,y,height=1,left=defaultLeftPosition,r
 
 verticalOffset = 2.5
 offset = verticalOffset
+topScale = computeScale(defaultLeftPosition, defaultRightPosition, math.log10(10))
+positionOfTwo  = topScale * math.log10(2) + defaultLeftPosition
+positionOfFive = topScale * math.log10(5) + defaultLeftPosition
 drawLog10Line(1,10,slide,offset)
+drawTicker(1,2 ,0.05,slide,offset,height=tickerLengthLevel1,right=positionOfTwo)
+drawTicker(1,2 ,0.01,slide,offset,height=tickerLengthLevel2,right=positionOfTwo)
+drawTicker(2,5 ,0.1 ,slide,offset,height=tickerLengthLevel1,left=positionOfTwo,right=positionOfFive)
+drawTicker(2,5 ,0.02,slide,offset,height=tickerLengthLevel2,left=positionOfTwo,right=positionOfFive)
+drawTicker(5,10,0.1 ,slide,offset,height=tickerLengthLevel1,left=positionOfFive)
+drawTicker(5,10,0.05,slide,offset,height=tickerLengthLevel2,left=positionOfFive)
 offset += verticalOffset
 # drawLogLine(1,2,11,2,slide,offset,indexScale=0.1)
 # offset += verticalOffset
