@@ -10,7 +10,7 @@ from pptx import Presentation
 from pptx.util import Cm, Pt
 import math
 
-defaultLeftPosition = 1
+defaultLeftPosition = 2
 defaultRightPosition = 26
 tickerLengthLevel0 = 1.0/2
 tickerLengthLevel1 = 0.5/2
