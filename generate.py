@@ -91,20 +91,20 @@ def drawLog2Line(begin,end,ticNumber,slide,y,height=tickerLengthLevel0,left=defa
         position=scale*((math.log2(scaledIndex))-leftLog)+left
         # print(f"scaledIndex:{scaledIndex}")
         # print(f"position   :{position}")
-        slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-height), Cm(position), Cm(y+height))
+        # slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-height), Cm(position), Cm(y+height))
         textBox = slide.shapes.add_textbox(Cm(position-0.5), Cm(y-1), Cm(1), Cm(1))
         textFrame0 = textBox.text_frame
         paragraph0 = textFrame0.paragraphs[0]
         paragraph0.text = str(scaledIndex)
         paragraph0.font.size = Pt(8)
         paragraph0.alignment = PP_ALIGN.CENTER
-    for i in range(0,ticNumber-1):
-        scaledIndex = i * indexScale + begin
-        for j in range(1,8):
-            fineTics = (scaledIndex + (j * begin/16)) * 1.0
-            position=scale*(math.log2(fineTics)-leftLog)+left
-            # print(f"{fineTics},{position}")
-            slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
+    # for i in range(0,ticNumber-1):
+    #     scaledIndex = i * indexScale + begin
+    #     for j in range(1,8):
+    #         fineTics = (scaledIndex + (j * begin/16)) * 1.0
+    #         position=scale*(math.log2(fineTics)-leftLog)+left
+    #         # print(f"{fineTics},{position}")
+    #         slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(position), Cm(y-0.2), Cm(position), Cm(y+0.2))
 
 # line1=slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, 1, Cm(2), Cm(1), Cm(2))
 # line1=slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Cm(1), Cm(1), Cm(3), Cm(3))
@@ -125,8 +125,20 @@ offset += verticalOffset
 # drawLogLine(1,2,11,2,slide,offset,indexScale=0.1)
 # offset += verticalOffset
 drawLog2Line(16,160,19,slide,offset,indexScale=8)
+drawTicker(16,160,8,slide,offset,height=tickerLengthLevel0)
+drawTicker(16,160,4,slide,offset,height=tickerLengthLevel1)
+drawTicker(16,160,1,slide,offset,height=tickerLengthLevel2)
 offset += verticalOffset
 drawLog2Line(160,1600,19,slide,offset,indexScale=80)
+drawTicker(160,320 ,16,slide,offset,height=tickerLengthLevel0,right=positionOfTwo)
+drawTicker(160,320 ,8 ,slide,offset,height=tickerLengthLevel1,right=positionOfTwo)
+drawTicker(160,320 ,2 ,slide,offset,height=tickerLengthLevel2,right=positionOfTwo)
+drawTicker(320,800 ,32,slide,offset,height=tickerLengthLevel0,left=positionOfTwo,right=positionOfFive)
+drawTicker(320,800 ,16,slide,offset,height=tickerLengthLevel1,left=positionOfTwo,right=positionOfFive)
+drawTicker(320,800 ,4 ,slide,offset,height=tickerLengthLevel2,left=positionOfTwo,right=positionOfFive)
+drawTicker(800,1600,80,slide,offset,height=tickerLengthLevel0,left=positionOfFive)
+drawTicker(800,1600,16,slide,offset,height=tickerLengthLevel1,left=positionOfFive)
+drawTicker(800,1600,8 ,slide,offset,height=tickerLengthLevel2,left=positionOfFive)
 offset += verticalOffset
 # drawLogLine(160,1600,46,2,slide,offset,indexScale=32)
 # offset += verticalOffset
